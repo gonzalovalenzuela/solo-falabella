@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "Solo Falabella",
+  "version": "1.0.0",
+  "description": "Filtra los listados de falabella.com (Chile) para mostrar solo productos vendidos por Falabella.",
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "*://www.falabella.com/*"
+  ],
+  "background": {
+    "scripts": ["common.js", "background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": "icon.svg",
+    "default_title": "Solo Falabella",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "solo-falabella@gonzalovalenzuela.cl",
+      "strict_min_version": "109.0"
+    }
+  }
+}
