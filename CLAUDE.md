@@ -15,9 +15,9 @@ Extensión para Firefox (Manifest V2, `manifest.json`) y Chrome (Manifest V3, `m
 - Cuando el usuario quita el filtro desde el popup, se guarda `optOut:<tabId>` → `pageKey(url)` en `storage.session` para no reaplicarlo en esa misma página. No se usa memoria porque el background se descarga cuando está inactivo (service worker en Chrome).
 - Páginas consideradas listado: regex `LISTING_RE` en `common.js` (`category|brand|search|collection|seller`).
 
-## Cosas sin verificar
+## Parámetro del filtro
 
-- El nombre del parámetro (`f.derived.variant.sellerId`) no se confirmó en el sitio en vivo. Si el filtro no funciona, aplicar "Vendido por → Falabella" manualmente en el sitio y copiar el parámetro real de la URL.
+- `f.derived.variant.sellerId=FALABELLA` está confirmado en el sitio en vivo (nov 2026): en Smart TV baja de 365 a 131 productos, todos vendidos por Falabella. Si Falabella lo cambia, aplicar "Vendido por → Falabella" manualmente en el sitio y copiar el parámetro real de la URL.
 
 ## Comandos
 
