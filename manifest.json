@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Solo Falabella",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Filtra los listados de falabella.com (Chile) por vendedor: Falabella, Sodimac o Tottus.",
   "icons": {
     "48": "icon.svg",
