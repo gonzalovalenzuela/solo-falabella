@@ -29,5 +29,5 @@ Extensión para Firefox (Manifest V2, `manifest.json`) y Chrome (Manifest V3, `m
 
 ## Publicación
 
-- AMO (addons.mozilla.org) es gratis. Para uso personal: "sin listar".
-- Si se lista públicamente, cambiar el nombre a algo que no parezca oficial (p. ej. "Filtro de vendedor para Falabella.com") por las políticas de marcas de AMO.
+- AMO (addons.mozilla.org) es gratis. Está listada públicamente desde la 1.0.2.
+- Desde la 1.0.3 se llama "Filtro de vendedor para Falabella.com" (antes "Solo Falabella") para no parecer oficial, por las políticas de marcas de AMO. El repo y los archivos de `dist/` mantienen `solo-falabella`, y el ID de gecko no se cambia.

@@ -1,4 +1,4 @@
-# Solo Falabella
+# Filtro de vendedor para Falabella.com
 
 Extensión para Firefox y Chrome que filtra los listados de [falabella.com](https://www.falabella.com/falabella-cl) (Chile) por vendedor: **Falabella**, **Sodimac** y/o **Tottus**, ocultando los de vendedores del marketplace.
 
