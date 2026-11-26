@@ -7,8 +7,8 @@ const vm = require("vm");
 const ctx = { URL };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "common.js"), "utf8") +
-  "\nthis.api = { isListing, hasFilter, addFilter, removeFilter };", ctx);
-const { isListing, hasFilter, addFilter, removeFilter } = ctx.api;
+  "\nthis.api = { isListing, hasFilter, addFilter, removeFilter, pageKey, optOutKey };", ctx);
+const { isListing, hasFilter, addFilter, removeFilter, pageKey, optOutKey } = ctx.api;
 
 const tv = "https://www.falabella.com/falabella-cl/category/cat7190148/Smart-TV?sortBy=derived.price.search%2Casc&f.derived.product.attribute.range.Tamano_de_la_pantalla_cat7190148=32%22+-+39.9%22%3A%3A40%22+-+49.9%22%3A%3AHasta+31.9%22&facetSelected=true&page=3";
 
@@ -31,5 +31,10 @@ const multi = "https://www.falabella.com/falabella-cl/brand/APPLE?f.derived.vari
 const multiOn = addFilter(multi);
 assert.strictEqual(new URL(multiOn).searchParams.get("f.derived.variant.sellerId"), "SODIMAC::FALABELLA");
 assert.strictEqual(new URL(removeFilter(multiOn)).searchParams.get("f.derived.variant.sellerId"), "SODIMAC");
+
+// pageKey ignora la query (filtro, página, orden)
+assert.strictEqual(pageKey(tv), pageKey(removeFilter(on)));
+assert.strictEqual(pageKey(tv), "https://www.falabella.com/falabella-cl/category/cat7190148/Smart-TV");
+assert.strictEqual(optOutKey(7), "optOut:7");
 
 console.log("OK");

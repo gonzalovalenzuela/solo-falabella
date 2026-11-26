@@ -25,8 +25,9 @@ const autoBox = document.getElementById("auto");
     let newUrl;
     if (on) {
       newUrl = removeFilter(tab.url);
-      // Evita que el modo automático lo vuelva a aplicar en esta página
-      await API.runtime.sendMessage({ type: "optOut", tabId: tab.id, url: newUrl });
+      // Evita que el modo automático lo vuelva a aplicar en esta página.
+      // Keeps auto mode from re-applying it on this page.
+      await API.storage.session.set({ [optOutKey(tab.id)]: pageKey(newUrl) });
     } else {
       newUrl = addFilter(tab.url);
     }

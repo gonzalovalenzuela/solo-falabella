@@ -31,6 +31,23 @@ function addFilter(urlStr) {
   return u.toString();
 }
 
+// Identifica la página (sin query) para recordar dónde el usuario quitó
+// el filtro. / Identifies the page (without query) for opt-out tracking.
+function pageKey(urlStr) {
+  try {
+    const u = new URL(urlStr);
+    return u.origin + u.pathname;
+  } catch (e) {
+    return urlStr;
+  }
+}
+
+// Clave en storage.session de la exclusión de una pestaña.
+// storage.session key for a tab's opt-out.
+function optOutKey(tabId) {
+  return "optOut:" + tabId;
+}
+
 function removeFilter(urlStr) {
   const u = new URL(urlStr);
   const current = u.searchParams.get(PARAM);
