@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Solo Falabella",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Filtra los listados de falabella.com (Chile) para mostrar solo productos vendidos por Falabella.",
   "icons": {
     "48": "icon.svg",
@@ -24,7 +24,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "solo-falabella@gonzalovalenzuela.cl",
-      "strict_min_version": "109.0"
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   }
 }
