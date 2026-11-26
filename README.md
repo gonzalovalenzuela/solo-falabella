@@ -39,7 +39,7 @@ Ejecutar `./build.sh`, ir a `chrome://extensions`, activar "Modo de desarrollado
 
 | Archivo | Rol |
 |---|---|
-| `manifest.json` | Firefox: Manifest V2 (Firefox ≥ 109) |
+| `manifest.json` | Firefox: Manifest V2 (Firefox ≥ 109, Android ≥ 142) |
 | `manifest.chrome.json` | Chrome: Manifest V3; `build.sh` lo copia como `manifest.json` |
 | `sw.js` | Service worker de Chrome: carga `common.js` y `background.js` |
 | `common.js` | Lógica de URL compartida: `SELLERS`, `isListing`, `selectedIn`, `applySellers` |
