@@ -11,27 +11,26 @@
       color: #222;
     }
     h1 { font-size: 14px; margin: 0 0 10px; }
-    button {
-      width: 100%;
-      padding: 8px;
-      border: 0;
-      border-radius: 6px;
-      background: #aad500;
-      color: #1a1a1a;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    button.on { background: #e5e5e5; }
-    button:disabled { opacity: .5; cursor: default; }
-    label { display: flex; gap: 6px; align-items: center; margin-top: 12px; }
     #status { margin: 0 0 10px; color: #555; }
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin: 0;
+      padding: 6px 10px 8px;
+    }
+    legend { font-weight: 600; padding: 0 4px; }
+    label { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+    input { accent-color: #7a9a00; }
+    .auto { margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Solo Falabella</h1>
   <p id="status">…</p>
-  <button id="toggle" disabled>Mostrar solo Falabella</button>
-  <label>
+  <fieldset id="sellers">
+    <legend>Vendido por</legend>
+  </fieldset>
+  <label class="auto">
     <input type="checkbox" id="auto">
     Aplicar automáticamente
   </label>

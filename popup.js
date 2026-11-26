@@ -1,38 +1,58 @@
+// Popup: casillas de vendedores que se aplican al instante a la pestaña
+// actual y se guardan para el modo automático. Ninguna = todos.
+// Popup: seller checkboxes applied instantly to the current tab and saved
+// for auto mode. None checked = all sellers.
+
 const API = typeof browser !== "undefined" ? browser : chrome;
 
-const btn = document.getElementById("toggle");
 const status = document.getElementById("status");
+const fieldset = document.getElementById("sellers");
 const autoBox = document.getElementById("auto");
 
+// Crea una casilla por vendedor / one checkbox per seller
+const boxes = SELLERS.map(({ id, name }) => {
+  const label = document.createElement("label");
+  const box = document.createElement("input");
+  box.type = "checkbox";
+  box.value = id;
+  label.append(box, " " + name);
+  fieldset.append(label);
+  return box;
+});
+
+const checked = () => boxes.filter((b) => b.checked).map((b) => b.value);
+
+function describe(urlStr) {
+  const ids = selectedIn(urlStr);
+  if (!ids.length) return "Mostrando todos los vendedores.";
+  const names = SELLERS.filter((s) => ids.includes(s.id)).map((s) => s.name);
+  return "Mostrando: " + names.join(", ") + ".";
+}
+
 (async () => {
-  const { auto } = await API.storage.local.get({ auto: false });
-  autoBox.checked = auto;
+  const stored = await API.storage.local.get({ auto: false, sellers: [] });
+  autoBox.checked = stored.auto;
+  const selected = normalizeSellers(stored.sellers);
+  boxes.forEach((b) => (b.checked = selected.includes(b.value)));
 
   const [tab] = await API.tabs.query({ active: true, currentWindow: true });
+  const onListing = !!(tab && tab.url && isListing(tab.url));
+  let currentUrl = onListing ? tab.url : null;
 
-  if (!tab || !tab.url || !isListing(tab.url)) {
-    status.textContent = "Abre un listado de falabella.com (categoría, marca o búsqueda).";
-    return;
-  }
+  status.textContent = onListing
+    ? describe(currentUrl)
+    : "Abre un listado de falabella.com (categoría, marca o búsqueda) para aplicar el filtro.";
 
-  const on = hasFilter(tab.url);
-  status.textContent = on ? "Filtro activo." : "Mostrando todos los vendedores.";
-  btn.textContent = on ? "Mostrar todos los vendedores" : "Mostrar solo Falabella";
-  btn.classList.toggle("on", on);
-  btn.disabled = false;
+  fieldset.addEventListener("change", async () => {
+    const sellers = checked();
+    await API.storage.local.set({ sellers });
+    if (!currentUrl) return;
 
-  btn.addEventListener("click", async () => {
-    let newUrl;
-    if (on) {
-      newUrl = removeFilter(tab.url);
-      // Evita que el modo automático lo vuelva a aplicar en esta página.
-      // Keeps auto mode from re-applying it on this page.
-      await API.storage.session.set({ [optOutKey(tab.id)]: pageKey(newUrl) });
-    } else {
-      newUrl = addFilter(tab.url);
-    }
+    const newUrl = applySellers(currentUrl, sellers);
+    if (newUrl === currentUrl) return;
+    currentUrl = newUrl;
+    status.textContent = describe(newUrl);
     await API.tabs.update(tab.id, { url: newUrl });
-    window.close();
   });
 })();
 

@@ -1,14 +1,10 @@
-// Modo automático: si está activo, cualquier listado de Falabella
-// que se abra sin el filtro se redirige a la versión filtrada.
-// Las pestañas donde el usuario quitó el filtro a mano quedan excluidas
-// hasta que cambie de página.
-// Auto mode: unfiltered Falabella listings are redirected to the filtered
-// version, except in tabs where the user removed the filter by hand.
-//
-// Las exclusiones se guardan en storage.session (no en memoria) porque el
-// service worker de Chrome y la página de eventos de Firefox se descargan
-// cuando están inactivos. / Opt-outs live in storage.session (not memory)
-// because the background is unloaded when idle in both browsers.
+// Modo automático: si está activo y hay vendedores seleccionados, cada
+// listado de Falabella que se abra sin filtro de vendedor se redirige a la
+// versión filtrada. Si la URL ya filtra por algún vendedor (por ejemplo,
+// elegido en el sitio), se respeta.
+// Auto mode: when enabled with sellers selected, listings opened without a
+// seller filter are redirected to the filtered version. URLs that already
+// filter by a seller (e.g. chosen on the site) are left alone.
 
 const API = typeof browser !== "undefined" ? browser : chrome;
 
@@ -16,19 +12,11 @@ API.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   const url = changeInfo.url;
   if (!url || !isListing(url)) return;
 
-  const { auto } = await API.storage.local.get({ auto: false });
-  if (!auto) return;
+  const { auto, sellers } = await API.storage.local.get({ auto: false, sellers: [] });
+  const selected = normalizeSellers(sellers);
+  if (!auto || !selected.length) return;
 
-  const key = optOutKey(tabId);
-  const { [key]: skip } = await API.storage.session.get(key);
-  if (skip && skip === pageKey(url)) return;
-  if (skip) await API.storage.session.remove(key);
-
-  if (!hasFilter(url)) {
-    API.tabs.update(tabId, { url: addFilter(url) });
+  if (!selectedIn(url).length) {
+    API.tabs.update(tabId, { url: applySellers(url, selected) });
   }
-});
-
-API.tabs.onRemoved.addListener((tabId) => {
-  API.storage.session.remove(optOutKey(tabId));
 });

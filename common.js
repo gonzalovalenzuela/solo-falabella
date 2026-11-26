@@ -1,8 +1,19 @@
 // Lógica compartida entre background y popup.
+// Shared logic for the background and the popup.
 const PARAM = "f.derived.variant.sellerId";
-const SELLER = "FALABELLA";
+
+// Vendedores seleccionables, en el orden en que se muestran y se escriben
+// en la URL. Varios se combinan con "::" (O lógico en el sitio).
+// Selectable sellers, in display/URL order. Joined with "::" (logical OR).
+const SELLERS = [
+  { id: "FALABELLA", name: "Falabella" },
+  { id: "SODIMAC", name: "Sodimac" },
+  { id: "TOTTUS", name: "Tottus" },
+];
+const SELLER_IDS = SELLERS.map((s) => s.id);
 
 // Páginas de listado donde el filtro tiene sentido.
+// Listing pages where the filter applies.
 const LISTING_RE = /^\/falabella-cl\/(category|brand|search|collection|seller)\b/i;
 
 function isListing(urlStr) {
@@ -14,47 +25,41 @@ function isListing(urlStr) {
   }
 }
 
-function hasFilter(urlStr) {
-  const u = new URL(urlStr);
+// Deja solo IDs conocidos, sin repetir y en el orden de SELLERS.
+// Keeps known IDs only, deduplicated, in SELLERS order.
+function normalizeSellers(ids) {
+  const set = new Set(Array.isArray(ids) ? ids : []);
+  return SELLER_IDS.filter((id) => set.has(id));
+}
+
+function urlSellers(u) {
   const v = u.searchParams.get(PARAM);
-  return !!v && v.split("::").includes(SELLER);
+  return v ? v.split("::").filter(Boolean) : [];
 }
 
-function addFilter(urlStr) {
+// Vendedores seleccionables presentes en la URL.
+// Selectable sellers present in the URL.
+function selectedIn(urlStr) {
+  return normalizeSellers(urlSellers(new URL(urlStr)));
+}
+
+// Devuelve la URL filtrada exactamente por `selected` (vacío = todos los
+// vendedores). Conserva otros vendedores que no son seleccionables.
+// Returns the URL filtered by exactly `selected` (empty = all sellers),
+// keeping any non-selectable sellers already in the URL.
+function applySellers(urlStr, selected) {
   const u = new URL(urlStr);
-  const current = u.searchParams.get(PARAM);
-  const sellers = current ? current.split("::").filter(Boolean) : [];
-  if (!sellers.includes(SELLER)) sellers.push(SELLER);
-  u.searchParams.set(PARAM, sellers.join("::"));
-  u.searchParams.set("facetSelected", "true");
-  u.searchParams.delete("page"); // volver a la página 1
-  return u.toString();
-}
+  const current = urlSellers(u);
+  const others = current.filter((s) => !SELLER_IDS.includes(s));
+  const next = [...others, ...normalizeSellers(selected)];
+  if (next.join("::") === current.join("::")) return urlStr;
 
-// Identifica la página (sin query) para recordar dónde el usuario quitó
-// el filtro. / Identifies the page (without query) for opt-out tracking.
-function pageKey(urlStr) {
-  try {
-    const u = new URL(urlStr);
-    return u.origin + u.pathname;
-  } catch (e) {
-    return urlStr;
+  if (next.length) {
+    u.searchParams.set(PARAM, next.join("::"));
+    u.searchParams.set("facetSelected", "true");
+  } else {
+    u.searchParams.delete(PARAM);
   }
-}
-
-// Clave en storage.session de la exclusión de una pestaña.
-// storage.session key for a tab's opt-out.
-function optOutKey(tabId) {
-  return "optOut:" + tabId;
-}
-
-function removeFilter(urlStr) {
-  const u = new URL(urlStr);
-  const current = u.searchParams.get(PARAM);
-  if (!current) return urlStr;
-  const sellers = current.split("::").filter((s) => s && s !== SELLER);
-  if (sellers.length) u.searchParams.set(PARAM, sellers.join("::"));
-  else u.searchParams.delete(PARAM);
-  u.searchParams.delete("page");
+  u.searchParams.delete("page"); // volver a la página 1 / back to page 1
   return u.toString();
 }
